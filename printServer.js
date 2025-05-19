@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const escpos = require('escpos');
 const path = require('path');
+const cors = require('cors');
 
 escpos.USB = require('escpos-usb');
 
@@ -9,6 +10,10 @@ const app = express();
 const PORT = 3333;
 
 app.use(bodyParser.json());
+app.use(cors({
+    origin: 'https://totem.ciedcomplexohospitalar.com.br',
+    methods: ['POST'],
+}));
 
 app.post('/print', async (req, res) => {
     const { code, type, procedimento, profissional, createdAt } = req.body;
