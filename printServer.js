@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const escpos = require('escpos');
 const path = require('path');
 const cors = require('cors');
+const iconv = require('iconv-lite');
 
 escpos.USB = require('escpos-usb');
 
@@ -19,7 +20,7 @@ app.post('/print', async (req, res) => {
     const { code, type, procedimento, profissional, createdAt } = req.body;
 
     const device = new escpos.USB();
-    const options = { encoding: 'GB18030' };
+    const options = { encoding: iconv.encodingExists('CP860') ? 'CP860' : 'CP437' };
     const printer = new escpos.Printer(device, options);
 
     const data = new Date(createdAt || Date.now());
@@ -37,12 +38,13 @@ app.post('/print', async (req, res) => {
                 .then(() => {
                     printer
                         .align('CT')
+                        .size(0, 0)
                         .text(dateStr + ' - ' + timeStr)
                         .newLine()
                         .style('B')
                         .size(2, 2)
                         .text(`SENHA: ${code}`)
-                        .size(1, 1)
+                        .size(0, 0)
                         .style('B')
                         .text(tipoLabel)
                         .drawLine()
